@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<typesystem package="PyHybrid">
+    <load-typesystem name="typesystem_core.xml" generate="no"/>
+    <load-typesystem name="typesystem_gui.xml" generate="no"/>
+    <object-type name="MainWindow"/>
+</typesystem>
+
