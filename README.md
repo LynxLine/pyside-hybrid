@@ -159,6 +159,7 @@ void MainWindow::runPythonCode() {
 
 As result we have a window with editor (left) and canvas (right):
 
+![image1](https://github.com/yshurik/pyside-hybrid/raw/master/images/PySideHybrid-1.png)
 
 Now it is time to to turn it into PySide-based application. We are going to:
 
@@ -305,3 +306,55 @@ a.exec_()
 ```
 
 If you run it you will get same window as in c++ application except that python code entered in left panel with editor can be executed just here and the python code has control of our c++ part.
+
+Let’s try small code snippets like:
+``` python
+mainWindow.statusBar().show()
+```
+
+Oh! status bar is appeared in our application. Well, more complex maybe – let’s change background of canvas:
+``` python
+mainWindow.scene.setBackgroundBrush(QColor('#e0e0ff'))
+```
+
+Can we create new objects? Of course yes:
+``` python
+li1 = QGraphicsLineItem(10,10, 500,500)
+li1.setPen(QPen(QBrush(QColor("#ff0000")), 3.0, Qt.DashLine))
+mainWindow.scene.addItem(li1)
+```
+
+![image2](https://github.com/yshurik/pyside-hybrid/raw/master/images/PySideHybrid-2.png)
+
+Can we create new classes just in real time and instanciate them?
+Again yes!. Let’s create subclass of QGraphicsItem and make custom painting:
+
+``` python
+mainWindow.viewer.setRenderHint(QPainter.Antialiasing)
+class MyItem(QGraphicsItem):
+	def boundingRect(self):
+		return QRectF(-100,-100,200,200)
+
+	def paint(self, painter, option, widget):
+		g = QLinearGradient(-100,-100, 100,100)
+		g.setColorAt(0, QColor('#00ff00'))
+		g.setColorAt(1, QColor('#ffffff'))
+		painter.setBrush(g)
+		p = QPen(QBrush(QColor("#ff0000")), 4, Qt.DashLine)
+		painter.setPen(p)
+		painter.drawRoundedRect(-100,-100,200,200, 30,30)
+
+my1 = MyItem()
+mainWindow.scene.addItem(my1)
+my1.setPos(200,200)
+```
+
+![image3](https://github.com/yshurik/pyside-hybrid/raw/master/images/PySideHybrid-3.png)
+
+Well, so we can do everything with our small application – we can program it in real time. We can even generate code by program itself to execute it and more. Anyway, this also can be used for performance balancing when you can quickly prototype your code in python, and then transfer such code into C++ to make it running fast.
+
+Good example – developing canvas-based games, when it can be really helpful and convenient to work with python code to make the logic, drawing etc and then migrate some code into C++.
+
+Also it is very good for mobile devices – you program with python-pyside until you encounter performance issues and in this point you can easily separate critical part into c++ and keep Qt-like interface between these two parts.
+
+Regarding our small application above – you can ask What is the difference to just programming with your editor? – You are coding your application while it is running. This is very new approach to programming with Qt. There is one especiality – you can loose your programming when exit :), So, it makes sense to modify the application to save all your code snippets to files.
